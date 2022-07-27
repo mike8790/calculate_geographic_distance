@@ -1,7 +1,7 @@
 # Code to solve problem set for job application:
 
 Take a list of hotels with latitude and longitude,
-figure out N closest hotels (on hotel) for each hotel.
+figure out N closest hotels (on hotel list) for each hotel.
 
 Hotel list takes form col_1 = 'hotel_id', col_2 = 'longitude', col_3 = 'latitude'
 
