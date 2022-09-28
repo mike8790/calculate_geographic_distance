@@ -13,7 +13,7 @@ def calc_dist_coord(df, num_near):
 
     # initialise dataframe to store distances at each loop
     column_1 = list(df.hotel_id)
-    df_dist = pd.DataFrame(column_1index=column_1)
+    df_dist = pd.DataFrame(column_1, index=column_1)
 
     # initialise empty list that will store information for each hotel
     full_list = []
@@ -51,7 +51,8 @@ def calc_dist_coord(df, num_near):
             a = (sin(dlat / 2) * sin(dlat / 2) +
                 cos(radians(n_lat)) * cos(radians(i_lat)) *
                 sin(dlong / 2) * sin(dlong / 2))
-            c = 2 * atan2(sqrt(a), sqrt(1 - a)) # can multiply c by 6373.0 to get distance in km
+            c = 2 * atan2(sqrt(a), sqrt(1 - a))
+            c = c * 6373.0 # can multiply c by 6373.0 to get distance in km
             
             # append distance measured between hotel(n) and hotel(i) to distance list
             dist_list.append(c)
@@ -75,10 +76,11 @@ def calc_dist_coord(df, num_near):
     df_full = pd.DataFrame(full_list, columns=["hotel", "closest_hotels", "distances"])
         
     print(time.time() - t2)
-
     return df_full     
 
 # # lines used to test function
-df = pd.read_csv("tester_csv3.csv", sep= ',')
+df = pd.read_csv("tester_csv.csv", sep= ',')
 num_near = 10
 print(calc_dist_coord(df, num_near))
+
+

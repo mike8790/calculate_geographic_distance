@@ -4,28 +4,22 @@
 from math import sin, cos, sqrt, atan2, radians
 import pandas as pd
 import time
+import csv
 
 def calc_dist_coord(df, num_near):
-
-    t2 = time.time()
 
     range_len = range(len(df.hotel_id))
 
     # initialise dataframe to store distances at each loop
     column_1 = list(df.hotel_id)
-    df_dist = pd.DataFrame(column_1index=column_1)
-
-    # initialise empty list that will store information for each hotel
-    full_list = []
+    big_list = []
 
     # begin outer loop to iterate through each hotel on list 
     for n in range_len:
 
         # initialise list to hold distances for current working hotel (n)
-        dist_list = []
-        
-        # create column name variable from id of current working hotel (n)
-        column_name = str(column_1[n])
+        top_ten = [100000000] * num_near
+        top_ten_names = [1000] * num_near
 
         # create variable from hotel(n) longitude and latitude - so dataframe doesn't have to be
         # dynaimcally indexed at each iteration of the inner loop
@@ -34,7 +28,7 @@ def calc_dist_coord(df, num_near):
 
 
         # begin inner loop to iterate through each hotel and measure distance from hotel(n) 
-        for i in range_len:
+        for i in range(10):
 
             # create variable from hotel(i) longitude and latitude - so dataframe doesn't have to be
             # dynaimcally indexed multiple times for distance calculations
@@ -48,37 +42,57 @@ def calc_dist_coord(df, num_near):
 
 
             # equation to calculate distance between two points on sphere (Haversine Equation)
+           a = (sin(dlat / 2) * sin(dlat / 2) +
+                cos(radians(n_lat)) * cos(radians(i_lat)) *
+                sin(dlong / 2) * sin(dlong / 2)) 
+            c = 2 * atan2(sqrt(a), sqrt(1 - a)) # can multiply c by 6373.0 to get distance in km
+
+            if c != 0.0:
+                top_ten[i] = c
+                top_ten_names[i] = str(column_1[i])
+
+        for jj in range(10, len(df.hotel_id)):
+
+            # create variable from hotel(i) longitude and latitude - so dataframe doesn't have to be
+            # dynaimcally indexed multiple times for distance calculations
+            i_long = df.longitude[jj]
+            i_lat = df.latitude[jj]
+
+            # diff. between longitudes and latitudes of two locations needed to 
+            # calculate distances between them
+            dlong = radians(i_long - n_long)
+            dlat = radians(i_lat - n_lat)
+
+
+            # equation to calculate distance between two points on sphere (Haversine Equation)
             a = (sin(dlat / 2) * sin(dlat / 2) +
                 cos(radians(n_lat)) * cos(radians(i_lat)) *
                 sin(dlong / 2) * sin(dlong / 2))
             c = 2 * atan2(sqrt(a), sqrt(1 - a)) # can multiply c by 6373.0 to get distance in km
-            
-            # append distance measured between hotel(n) and hotel(i) to distance list
-            dist_list.append(c)
-           
-        # add distance list for (n) to dataframe - transferring to dataframe allows for identification 
-        # of closest hotels (id & distance) using few lines of code with: pd.nsmallest function
-        df_dist["dist"] = dist_list
-        # distances of 0.0 (when hotel (n) is measured against itself) converted 
-        # to 10000 to avoid identifying (n) as closest hotel to (n)
-        df_dist = df_dist.replace(0.0, 10000)
-        # identify N closest, user-specified
-        closest_hotels = df_dist.nsmallest(num_near, 'dist')
+                
+            for ii in range(0, 10):
+                if c < top_ten[ii] and c > 0.0:
+                    top_ten[ii] = c
+                    top_ten_names[ii] = str(column_1[jj])
+                    break
 
-        # make list out of identities and distances of the N closest hotels, append to 
-        # 'full_list' with hotel (n)
-        close_hotel = list(closest_hotels.iloc[:,0])
-        hotel_distance = list(closest_hotels.iloc[:,1])
-        full_list.append([column_name, close_hotel, hotel_distance])
+        top_ten_full = list(zip(top_ten_names, top_ten))
+        big_list.append(top_ten_full)
 
-    # convert 'full_list' to dataframe for easier indexing/ saving elsewhere etc
-    df_full = pd.DataFrame(full_list, columns=["hotel", "closest_hotels", "distances"])
-        
-    print(time.time() - t2)
+    big_list = list(zip(column_1, big_list))
 
-    return df_full     
+    return big_list
 
 # # lines used to test function
-df = pd.read_csv("tester_csv3.csv", sep= ',')
+
+t2 = time.time()
+
+df = pd.read_csv("tester_csv2.csv", sep= ',')
 num_near = 10
-print(calc_dist_coord(df, num_near))
+
+bubba_dubba = calc_dist_coord(df, num_near)
+
+print(time.time() - t2)
+
+
+
