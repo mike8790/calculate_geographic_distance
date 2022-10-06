@@ -42,7 +42,7 @@ def calc_dist_coord(df, num_near):
 
 
             # equation to calculate distance between two points on sphere (Haversine Equation)
-           a = (sin(dlat / 2) * sin(dlat / 2) +
+            a = (sin(dlat / 2) * sin(dlat / 2) +
                 cos(radians(n_lat)) * cos(radians(i_lat)) *
                 sin(dlong / 2) * sin(dlong / 2)) 
             c = 2 * atan2(sqrt(a), sqrt(1 - a)) # can multiply c by 6373.0 to get distance in km
