@@ -9,10 +9,11 @@ import pandas as pd
 from scipy.spatial.distance import squareform, pdist
 from haversine import haversine
 
-## function that takes a csv (containing hotels, latitude and longitude) and number (N), to calculate N 
-# closest hotels to each hotel on list
 
-def calc_dist_coord(csv, num_near):
+## function that takes a csv (containing hotels, latitude and longitude) and number (N), to calculate N 
+# closest hotels to each hotel on list  
+
+def calc_dist_coord(csv: str, num_near: int, printout: bool= False, savename: str= None):
 
     # open CSV in to dataframe
     df = pd.read_csv(csv, sep= ',')
@@ -33,7 +34,7 @@ def calc_dist_coord(csv, num_near):
     # be in sorted order 
     indices = np.argpartition(dm, num_near)[:, :num_near].T
 
-    # initialize empty lists to store ten hotels and there distances for each column 
+    # # initialize empty lists to store ten hotels and there distances for each column 
     hotel_orders = []
     distances_orders = []
 
@@ -41,6 +42,7 @@ def calc_dist_coord(csv, num_near):
     # extract ID of those 10 hotels from hotel list
     # sort ten extracted distances and hotels as zipped list so hotel id and distances
     # stay together, append each distance and hotel to corresponding lists
+
     for n in range(indices.shape[1]):
         Y = dm[indices[:, n], n]
         X = hotels[indices[:, n]]
@@ -56,10 +58,16 @@ def calc_dist_coord(csv, num_near):
     df2.set_index('Hotels', inplace=True)
 
     # return dataframe with N closest hotels to each hotel, and their distances    
+    if printout == True:
+        print(df2)
+
+    if savename != None:
+        df.to_csv(savename)
+
     return df2  
 
 if __name__ == "__main__":
     import sys
-    arg1, arg2 = sys.argv[1:3]
+    arg1, arg2, arg3 = sys.argv[1:4]
 
 
